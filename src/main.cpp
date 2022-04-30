@@ -1,10 +1,17 @@
 #include <Arduino.h>
+#include <FastLED.h>
 #include "FFT.h" // include the library
 
 #define SAMPLES 256              // Must be a power of 2
 #define SAMPLING_FREQUENCY 40000 // Hz, must be less than 10000 due to ADC
+// #define VMAX 3.3
 
-#define VMAX 3.3
+// How many leds are in the strip?
+#define NUM_LEDS 60
+#define DATA_PIN 3
+
+// This is an array of leds.  One item for each led in your strip.
+CRGB leds[NUM_LEDS];
 
 unsigned int sampling_period_us;
 unsigned long microseconds; // current time since the Arduino board started
@@ -27,6 +34,8 @@ void setup()
 {
   Serial.begin(115200);
   sampling_period_us = round(1000000 * (1.0 / SAMPLING_FREQUENCY));
+
+  FastLED.addLeds<WS2811, DATA_PIN, RGB>(leds, NUM_LEDS);
 }
 
 void loop()
@@ -89,6 +98,14 @@ void loop()
   // Serial.print("Time taken: ");
   // Serial.print((t2 - t1) * 1.0 / 1000);
   // Serial.println(" milliseconds!");
+
+  for (int index = 0; index < NUM_LEDS; index++)
+  {
+    // Turn our current led on to white, then show the leds
+    leds[index] = CRGB::MediumVioletRed;
+  }
+
+  FastLED.show();
 
   // Clean up at the end to free the memory allocated
   fft_destroy(real_fft_plan);
